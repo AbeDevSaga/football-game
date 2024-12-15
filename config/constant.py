@@ -1,0 +1,1 @@
+# Game constants like screen size, player speed, etc.

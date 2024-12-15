@@ -1,0 +1,1 @@
+# Class for Ball logic (movement, collision, etc.)
