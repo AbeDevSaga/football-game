@@ -1,4 +1,7 @@
-# Main game loop and entry point
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from graphics import *
 from src.player import Player
 from src.ball import Ball
@@ -19,6 +22,8 @@ def main():
 
     score1 = 0
     score2 = 0
+    current_kicker = "player1"  # Who will kick the ball after a goal
+
     score_display = Text(Point(400, 20), f"Player 1: {score1}  |  Player 2: {score2}")
     score_display.setSize(16)
     score_display.setStyle('bold')
@@ -27,7 +32,7 @@ def main():
 
     while True:
         key = window.checkKey()
-        
+
         # Player 1 controls (W/S)
         if key == "w":
             player1.move(0, -20)
@@ -39,20 +44,29 @@ def main():
             player2.move(0, -20)
         elif key == "Down":
             player2.move(0, 20)
+        
+        # Kicking logic - player can only kick if ball is stopped
+        if key == "space" and ball.dx == 0 and ball.dy == 0:
+            if current_kicker == "player1":
+                ball.kick(4, 4)
+            elif current_kicker == "player2":
+                ball.kick(-4, -4)
 
         ball.move()
-
+        
         goal_scorer = goal.check_goal(ball)
-        if goal_scorer == "player1":
-            score1 += 1
-            ball = Ball(window, 400, 200)
-        elif goal_scorer == "player2":
-            score2 += 1
-            ball = Ball(window, 400, 200)
+        if goal_scorer:
+            if goal_scorer == "player1":
+                score1 += 1
+                current_kicker = "player1"  # Player 1 kicks the next ball
+            elif goal_scorer == "player2":
+                score2 += 1
+                current_kicker = "player2"  # Player 2 kicks the next ball
+            
+            ball.reset_position(400, 200)  # Reset ball at the center
+            score_display.setText(f"Player 1: {score1}  |  Player 2: {score2}")
 
-        score_display.setText(f"Player 1: {score1}  |  Player 2: {score2}")
-
-        if key == 'q':
+        if key == 'q':  # Quit game
             break
 
     window.close()
